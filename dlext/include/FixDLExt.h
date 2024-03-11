@@ -19,6 +19,7 @@ namespace dlext
 
 using TimeStep = bigint;  // bigint depends on how LAMMPS was built
 using DLExtCallback = std::function<void(TimeStep)>;
+using DLExtSetVirial = std::function<void(double*)>;
 
 // } // Aliases
 
@@ -39,9 +40,11 @@ public:
     int setmask() override;
     void post_force(int) override;
     void set_callback(DLExtCallback& cb);
+    void set_virial_callback(DLExtSetVirial& cb);
 
 private:
     DLExtCallback callback = [](TimeStep) { };
+    DLExtSetVirial setVirial = [](double*) { };
 };
 
 void register_FixDLExt(LAMMPS* lmp);

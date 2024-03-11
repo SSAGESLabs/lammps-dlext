@@ -52,10 +52,12 @@ void FixDLExt::post_force(int vflag)
     // invoke callback
     callback(update->ntimestep);
 
-    // TODO: put the callback's virial into this fix's member variable virial[6] (see fix.h)
-    // callback(virial)
+    // put the virial from the bias into this fix's member variable virial[6] (see fix.h)
+    setVirial(virial);
 }
 void FixDLExt::set_callback(DLExtCallback& cb) { callback = cb; }
+
+void FixDLExt::set_virial_callback(DLExtSetVirial& cb) { setVirial = cb; }
 
 void register_FixDLExt(LAMMPS* lmp)
 {
