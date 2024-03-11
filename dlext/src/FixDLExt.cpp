@@ -32,6 +32,10 @@ FixDLExt::FixDLExt(LAMMPS* lmp, int narg, char** arg)
     if (atom->map_style != Atom::MAP_ARRAY)
         error->all(FLERR, "Fix dlext requires to map atoms as arrays");
 
+    // signal that this fix contributes to the global virial
+    virial_global_flag = 1;
+    thermo_virial = 1;
+
     kokkosable = has_kokkos_cuda_enabled(lmp);
     atomKK = dynamic_cast<AtomKokkos*>(atom);
     execution_space = (on_host || !kokkosable) ? kOnHost : kOnDevice;
@@ -40,8 +44,20 @@ FixDLExt::FixDLExt(LAMMPS* lmp, int narg, char** arg)
 }
 
 int FixDLExt::setmask() { return FixConst::POST_FORCE; }
-void FixDLExt::post_force(int) { callback(update->ntimestep); }
+void FixDLExt::post_force(int vflag) 
+{
+    // virial setup
+    v_init(vflag);
+
+    // invoke callback
+    callback(update->ntimestep);
+
+    // put the virial from the bias into this fix's member variable virial[6] (see fix.h)
+    setVirial(virial);
+}
 void FixDLExt::set_callback(DLExtCallback& cb) { callback = cb; }
+
+void FixDLExt::set_virial_callback(DLExtSetVirial& cb) { setVirial = cb; }
 
 void register_FixDLExt(LAMMPS* lmp)
 {
