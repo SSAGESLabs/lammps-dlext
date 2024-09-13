@@ -22,7 +22,7 @@ const char* const kDLTensorCapsuleName = "dltensor";
 // See the DLPack Documentation https://dmlc.github.io/dlpack/latest/python_spec.html
 
 template <PropertyGetter property>
-inline PyCapsule enpycapsulate(const LAMMPSView& view, ExecutionSpace space)
+inline PyCapsule enpycapsulate(const LAMMPS& view, ExecutionSpace space)
 {
     auto dl_managed_tensor = property(view, space);
     return PyCapsule(

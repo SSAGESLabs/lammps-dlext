@@ -4,11 +4,10 @@
 #ifndef DLEXT_SAMPLER_H_
 #define DLEXT_SAMPLER_H_
 
-#include "LAMMPSView.h"
-
+#include "dlpack/dlpack.h"
 #include "fix.h"
-
 #include <functional>
+#include "LAMMPSView.h"
 
 namespace LAMMPS_NS
 {
@@ -19,6 +18,7 @@ namespace dlext
 
 using TimeStep = bigint;  // bigint depends on how LAMMPS was built
 using DLExtCallback = std::function<void(TimeStep)>;
+using DLExtSetVirial = std::function<void(double*)>;
 
 // } // Aliases
 
@@ -39,9 +39,15 @@ public:
     int setmask() override;
     void post_force(int) override;
     void set_callback(DLExtCallback& cb);
+    void set_virial_callback(DLExtSetVirial& cb);
+    void set_virial_global(int flag) { virial_global_flag = flag; }
+    void set_view(LAMMPSView _view);
+    LAMMPSView get_view() const;
 
-private:
+protected:
     DLExtCallback callback = [](TimeStep) { };
+    DLExtSetVirial setVirial = [](double*) { };
+    LAMMPSView view;
 };
 
 void register_FixDLExt(LAMMPS* lmp);

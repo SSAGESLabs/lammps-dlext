@@ -49,6 +49,8 @@ void export_FixDLExt(py::module& m)
             return static_cast<FixDLExt*>(fix);
         }))
         .def("set_callback", &FixDLExt::set_callback)
+        .def("set_virial_callback", &FixDLExt::set_virial_callback)
+        .def_property("view", &FixDLExt::get_view, &FixDLExt::set_view);
         ;
 }
 
